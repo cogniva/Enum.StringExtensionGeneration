@@ -14,3 +14,12 @@ We're using the new C# Source Generators option to create a generator that will 
 ErrorCode resultingError = queryResult.ErrorCode;
 string errorMessage = resultingError.GetDescription();
 ```
+
+
+# Learning resources
+
+* Some useful recipes to help develop similar generators: https://github.com/dotnet/roslyn/blob/main/docs/features/source-generators.cookbook.md  
+* Online syntax tree viewer: https://sharplab.io/ (choose results dropdown, syntax tree) similar to https://astexplorer.net/  
+* Video tutorial: https://www.youtube.com/watch?v=052xutD86uI and accompanying source code https://github.com/TessenR/NotifyPropertyChangedDemo  
+* Source generator playground: https://sourcegen.dev/  and source https://github.com/davidwengier/SourceGeneratorPlayground
+* https://turnerj.com/blog/the-pain-points-of-csharp-source-generators
