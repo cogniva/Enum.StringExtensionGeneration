@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31321.278
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnumStringExtensionGenerator", "EnumStringExtensionGenerator\EnumStringExtensionGenerator.csproj", "{70A27EDB-F25F-4BF5-944E-938E80846108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EnumStringExtensionGenerator", "EnumStringExtensionGenerator\EnumStringExtensionGenerator\EnumStringExtensionGenerator.csproj", "{70A27EDB-F25F-4BF5-944E-938E80846108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnumStringExtensionGenerator.Test", "EnumStringExtensionGenerator.Test\EnumStringExtensionGenerator.Test.csproj", "{C91A52EA-DE36-42B0-AF20-BF697DA3C8E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnumStringExtensionGenerator.Test", "EnumStringExtensionGenerator\EnumStringExtensionGenerator.Test\EnumStringExtensionGenerator.Test.csproj", "{C91A52EA-DE36-42B0-AF20-BF697DA3C8E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
