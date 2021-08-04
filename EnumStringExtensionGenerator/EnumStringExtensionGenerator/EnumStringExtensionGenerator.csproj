@@ -4,6 +4,17 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>preview</LangVersion>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <PackageId>EnumStringExtensionGenerator</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Christine Salter</Authors>
+    <Company>Cogniva Information Solutions Inc.</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Simple source generator to create extension methods that simplify getting a localised string for an enum value.</Description>
+    <PackageProjectUrl>https://github.com/cogniva/Enum.StringExtensionGeneration</PackageProjectUrl>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <RepositoryUrl>https://github.com/cogniva/Enum.StringExtensionGeneration</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
