@@ -10,7 +10,9 @@ namespace EnumStringExtensionGenerator.Test
         public static string From(string shortDllName)
         {
             string dllString = AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES").ToString();
-            var dlls = dllString.Split(";".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            // The list is delimited with ; on Windows, but apparently with : on Linux, so we have to split on both.
+            var dlls = dllString.Split(";:".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             string dll = dlls.Single(d => d.Contains(shortDllName, StringComparison.OrdinalIgnoreCase));
             return dll;
         }
