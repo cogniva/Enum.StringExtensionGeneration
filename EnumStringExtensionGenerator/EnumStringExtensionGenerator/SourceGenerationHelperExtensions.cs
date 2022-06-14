@@ -33,7 +33,7 @@ namespace EnumStringExtensionGenerator
 
 {GetAccessibilityText(enumInfo.Accessibility)} static class {enumInfo.ExtensionClassName}
 {{
-{enumInfo.RequestedExtension.GenerateExtensionMethod() }
+{enumInfo.LiteralValueLookups.GenerateExtensionMethod() }
 }}"
                 .InNamespace(enumInfo.NamespaceName);
 
@@ -44,28 +44,47 @@ namespace EnumStringExtensionGenerator
         /// Generates the source code for an extension method that can be used to look up an appropriate localised
         /// string based on an enum value.
         /// </summary>
-        public static string GenerateExtensionMethod(this RequestedLocalizationExtensionInfo extensionInfo)
+        public static string GenerateExtensionMethod(this EnumValueLocalisationLookupInfo extensionInfo)
         {
+            string GenerateCase(EnumValueLocalisation localisationCase)
+            {
+                return 
+$@"            case {extensionInfo.EnumTypeName}.{localisationCase.OriginalValueName}:
+                discoveredValue = {localisationCase.ValueToReturn};
+                break;";
+            }
+
             static string GenerateDefault(DefaultEnumLocalisation defaultCase)
             {
                 return defaultCase.HasReturnValue
-                    ? $"return {defaultCase.ValueToReturn};"
+                    ? $@"discoveredValue = {defaultCase.ValueToReturn};
+                break;"
                     : @"throw new ArgumentException(""Provided value was invalid"", nameof(valueToLookup));";
             }
 
+            string GenerateReturn()
+            {
+                return extensionInfo.HasFormatting
+                    ? "return string.Format(discoveredValue, detail);"
+                    : "return discoveredValue;";
+            }
+
+            string parameter = extensionInfo.HasFormatting ? ", string detail" : "";
+
+
             return $@"
-    public static string GetDescription(this {extensionInfo.EnumTypeName} valueToLookup)
+    public static string {extensionInfo.MethodName}(this {extensionInfo.EnumTypeName} valueToLookup{parameter})
     {{
+        string discoveredValue = null;
         switch (valueToLookup)
         {{
 {
-    string.Join("\n", extensionInfo.Localisations.Select(localisationCase =>
-        $@"            case {extensionInfo.EnumTypeName}.{localisationCase.OriginalValueName}:
-                return {localisationCase.ValueToReturn};"))
+    string.Join("\n", extensionInfo.Localisations.Select(GenerateCase))
 }
             default:
                 { GenerateDefault(extensionInfo.Default) }
         }}
+        { GenerateReturn() }
     }}
 ";
         }

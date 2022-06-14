@@ -30,8 +30,9 @@ namespace EnumStringExtensionGenerator
     [Generator]
     public class ExtensionGenerator : ISourceGenerator
     {
-        public const string LocalisationAttributeName = "GenerateLocalisationAttribute";
-        public static readonly string LocalisationAttributeFileName = $"{LocalisationAttributeName}.cs";
+        public const string LiteralLocalisationAttributeName = "WithLiteralLocalisationAttribute";
+        public const string FormattedLocalisationAttributeName = "WithFormattedLocalisationAttribute";
+        public static readonly string LocalisationAttributeFileName = $"{LiteralLocalisationAttributeName}.cs";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -72,7 +73,7 @@ namespace EnumStringExtensionGenerator
                         ReportErrors(context, info, enumDeclarationSyntax.GetLocation());
                     }
 
-                    if (info.RequestedExtension != null)
+                    if (info.LiteralValueLookups != null)
                     {
                         var fileContents = info.GenerateExtensionClassFile();
                         context.AddSource(info.ExtensionClassName + ".cs", fileContents);

@@ -39,14 +39,14 @@ namespace EnumStringExtensionGenerator
 
         #region Methods to look up the resource class, its public properties, etc
 
-        public static AttributeData GetLocalizationAttribute(this INamedTypeSymbol enumTypeSymbol)
+        public static AttributeData GetLocalizationAttribute(this INamedTypeSymbol enumTypeSymbol, string attributeClassName)
         {
-            static bool IsLocalizationGenerationAttribute(AttributeData attributeData)
+            bool IsLocalizationGenerationAttribute(AttributeData attributeData)
             {
                 if (attributeData.AttributeClass == null)
                     return false;
 
-                return attributeData.AttributeClass.Name.Contains("GenerateLocalisationAttribute");
+                return attributeData.AttributeClass.Name.Contains(attributeClassName);
             }
 
             return enumTypeSymbol
@@ -65,6 +65,17 @@ namespace EnumStringExtensionGenerator
 
             var defaultPropertyName = possibleDefaultName?.ToString();
             return string.IsNullOrWhiteSpace(defaultPropertyName) ? null : defaultPropertyName;
+        }
+
+        public static string GetNamedPropertyValue(this AttributeData attribute, string propertyName, string defaultValue = null)
+        {
+            var rawStringValue =
+                attribute.NamedArguments.Any(pair => pair.Key.Equals(propertyName, StringComparison.Ordinal))
+                    ? attribute.NamedArguments.First(pair => pair.Key.Equals(propertyName, StringComparison.Ordinal)).Value.Value?.ToString()
+                    : defaultValue;
+            return string.IsNullOrWhiteSpace(rawStringValue)
+                ? defaultValue
+                : rawStringValue;
         }
 
         public static ITypeSymbol GetResourceManager(this AttributeData localizationAttribute)
@@ -89,28 +100,54 @@ namespace EnumStringExtensionGenerator
 
         public static EnumInfo CreateEnumInfo(this INamedTypeSymbol typeSymbol)
         {
-            var localizationAttribute = typeSymbol.GetLocalizationAttribute();
-            var requestedExtension = localizationAttribute != null
-                ? typeSymbol.CreateRequestedLocalizationExtensionInfo(localizationAttribute)
-                : null;
+            var literalValueLookups = typeSymbol.GetLookupsFor(ExtensionGenerator.LiteralLocalisationAttributeName);
+            var formattedValueLookups = typeSymbol.GetLookupsFor(ExtensionGenerator.FormattedLocalisationAttributeName);
 
             return new EnumInfo(typeSymbol.Name,
                 typeSymbol.GetContainingNamespaceName(),
                 typeSymbol.DeclaredAccessibility,
-                requestedExtension);
+                literalValueLookups, 
+                formattedValueLookups);
         }
 
-        private static RequestedLocalizationExtensionInfo CreateRequestedLocalizationExtensionInfo(this INamedTypeSymbol typeSymbol,
-            AttributeData localizationAttribute)
+        private static EnumValueLocalisationLookupInfo GetLookupsFor(this INamedTypeSymbol typeSymbol, string attributeClassName)
+        {
+            var localizationAttribute = typeSymbol.GetLocalizationAttribute(attributeClassName);
+            EnumValueLocalisationLookupInfo valueLookups;
+            if (localizationAttribute != null)
+            {
+                valueLookups = typeSymbol.CreateValueLookupInformation(localizationAttribute);
+            }
+            else
+            {
+                valueLookups = null;
+            }
+            return valueLookups;
+        }
+
+        private static EnumValueLocalisationLookupInfo CreateValueLookupInformation(this INamedTypeSymbol typeSymbol,
+            AttributeData localizationAttribute
+            )
         {
             ITypeSymbol resourceManager = localizationAttribute.GetResourceManager();
             var defaultName = localizationAttribute.GetDefaultPropertyName();
             var resourceManagerName = resourceManager.GetQualifiedName();
+            var resourceNameFormat = localizationAttribute.GetNamedPropertyValue("ResourceNameFormat");
+            resourceNameFormat = string.IsNullOrWhiteSpace(resourceNameFormat) ? "{0}{1}Description" : resourceNameFormat;
+            var methodName = localizationAttribute.GetNamedPropertyValue("MethodName");
             var propertyNames = resourceManager.GetStaticStringPropertyNames().ToList();
+
+            bool hasFormatting =
+                localizationAttribute.AttributeClass?.Name.Equals(ExtensionGenerator
+                    .FormattedLocalisationAttributeName) ?? false;
+            if (string.IsNullOrWhiteSpace(methodName))
+            {
+                methodName = "GetDescription";
+            }
 
             string MakeExpectedPropertyName(string enumValueName)
             {
-                return $"{typeSymbol.Name}{enumValueName}Description";
+                return string.Format(resourceNameFormat, typeSymbol.Name, enumValueName);
             }
 
             bool DoesPropertyNameExist(string expectedPropertyName)
@@ -135,8 +172,10 @@ namespace EnumStringExtensionGenerator
             var localisations = typeSymbol.MemberNames.Select(PrepareEnumValue);
             var defaultCase = new DefaultEnumLocalisation(defaultName, GetValidQualifiedPropertyName(defaultName));
 
-            return new RequestedLocalizationExtensionInfo(typeSymbol.Name,
+            return new EnumValueLocalisationLookupInfo(typeSymbol.Name,
                 defaultCase,
+                methodName,
+                hasFormatting,
                 localisations);
         }
 

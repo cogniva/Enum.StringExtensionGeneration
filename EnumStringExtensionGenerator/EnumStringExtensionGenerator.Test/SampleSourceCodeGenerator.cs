@@ -25,13 +25,17 @@ namespace EnumStringExtensionGenerator.Test
 }}";
         }
 
-        public static string WithLocalisation(this string code, string localisationNamespace, string localisationClassName, string defaultName = null)
+        public static string WithLocalisation(this string code, string localisationNamespace, string localisationClassName, string defaultName = null, string resourceNameFormat = null)
         {
             string defaultPropertyNameParam = string.IsNullOrWhiteSpace(defaultName)
                 ? ""
                 : $@", DefaultPropertyName=""{defaultName}""";
+            string resourceNameFormatParam = string.IsNullOrWhiteSpace(resourceNameFormat)
+                ? ""
+                : $@", ResourceNameFormat=""{resourceNameFormat}""";
+
             return
-                $@"[GenerateLocalisation(typeof({localisationClassName.WithNamespacePrefix(localisationNamespace)}){defaultPropertyNameParam})]
+                $@"[WithLiteralLocalisation(typeof({localisationClassName.WithNamespacePrefix(localisationNamespace)}){defaultPropertyNameParam}{resourceNameFormatParam})]
 {code}";
 
         }
@@ -61,6 +65,12 @@ namespace EnumStringExtensionGenerator.Test
         public static Func<string, (string Name, string ReturnValue)> PairGenerator(this string enumName)
         {
             return valueName => MakePair($"{enumName}{{0}}Description", valueName);
+        }
+
+        public static Func<string, (string Name, string ReturnValue)> PairGenerator(this string enumName,
+            string resourceNameFormat)
+        {
+            return valueName => (string.Format(resourceNameFormat, enumName, valueName), valueName);
         }
 
         private static (string Name, string ReturnValue) MakePair(string enumFormat, string valueName)
