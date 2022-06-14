@@ -8,14 +8,18 @@ namespace EnumStringExtensionGenerator
     /// resources class, but not necessarily) so that we can use that info to generate an extension method that will
     /// look up a relevant localised string for each value of an enum.
     /// </summary>
-    public class RequestedLocalizationExtensionInfo
+    public class EnumValueLocalisationLookupInfo
     {
-        public RequestedLocalizationExtensionInfo(string enumTypeName,
+        public EnumValueLocalisationLookupInfo(string enumTypeName,
             DefaultEnumLocalisation defaultCase,
+            string methodName,
+            bool hasFormatting,
             IEnumerable<EnumValueLocalisation> localisations)
         {
             EnumTypeName = enumTypeName;
             Default = defaultCase;
+            MethodName = methodName;
+            HasFormatting = hasFormatting;
 
             var localisationList = localisations.ToList();
 
@@ -52,6 +56,8 @@ namespace EnumStringExtensionGenerator
         public string EnumTypeName { get; }
         public DefaultEnumLocalisation Default { get; }
         public IEnumerable<EnumValueLocalisation> Localisations { get; }
+        public string MethodName { get; }
+        public bool HasFormatting { get; }
 
         public IEnumerable<GenerationError> Errors => _errors;
     }

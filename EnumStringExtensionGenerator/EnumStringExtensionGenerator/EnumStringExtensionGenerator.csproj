@@ -18,11 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="GenerateLocalisationAttribute.cs" />
+    <Compile Remove="WithLiteralLocalisationAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="GenerateLocalisationAttribute.cs" />
+    <EmbeddedResource Include="WithLiteralLocalisationAttribute.cs" />
   </ItemGroup>
 
   <ItemGroup>

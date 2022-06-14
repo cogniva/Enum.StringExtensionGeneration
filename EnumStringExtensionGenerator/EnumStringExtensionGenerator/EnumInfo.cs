@@ -8,13 +8,14 @@ namespace EnumStringExtensionGenerator
     /// </summary>
     public class EnumInfo
     {
-        public EnumInfo(string enumTypeName, string namespaceName, Accessibility accessibility, RequestedLocalizationExtensionInfo requestedExtension)
+        public EnumInfo(string enumTypeName, string namespaceName, Accessibility accessibility, EnumValueLocalisationLookupInfo literalValueLookups, EnumValueLocalisationLookupInfo formattedValueLookups)
         {
             EnumTypeName = enumTypeName;
             NamespaceName = namespaceName;
             Accessibility = accessibility;
-            RequestedExtension = requestedExtension;
-            _errors = new List<GenerationError>(requestedExtension?.Errors ?? new GenerationError[0]);
+            LiteralValueLookups = literalValueLookups;
+            FormattedValueLookups = formattedValueLookups;
+            _errors = new List<GenerationError>(literalValueLookups?.Errors ?? new GenerationError[0]);
         }
 
         private readonly List<GenerationError> _errors;
@@ -24,7 +25,8 @@ namespace EnumStringExtensionGenerator
         public string EnumTypeName { get; }
         public string NamespaceName { get; }
         public Accessibility Accessibility { get; }
-        public RequestedLocalizationExtensionInfo RequestedExtension { get; }
+        public EnumValueLocalisationLookupInfo LiteralValueLookups { get; }
+        public EnumValueLocalisationLookupInfo FormattedValueLookups { get; }
 
         public IEnumerable<GenerationError> Errors => _errors;
     }

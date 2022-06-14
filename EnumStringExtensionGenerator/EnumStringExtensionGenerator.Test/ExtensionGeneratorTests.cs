@@ -213,6 +213,28 @@ namespace EnumStringExtensionGenerator.Test
                 GenerationErrorCode.MissingRequiredDefaultPropertyName);
         }
 
+        [TestCaseSource(nameof(GenerateTwoNamespaceCases))]
+        public void AlternateResourceNameFormat(string enumNamespace, string localisationNamespace)
+        {
+            var alternativeFormat = "TestAltFormat{0}{1}";
+            var simpleEnumSource = EnumName.MakeEnumWithValues(_enumValues)
+                .WithLocalisation(localisationNamespace, LocalisationClassName, resourceNameFormat: alternativeFormat)
+                .InNamespace(enumNamespace)
+                .UsingExtensionNamespace();
+            var localisedStrings = LocalisationClassName
+                .MakeLocalisedStrings(_enumValues.Select(EnumName.PairGenerator(alternativeFormat)).ToArray())
+                .InNamespace(localisationNamespace);
+            var testClass = SampleSourceCodeGenerator.CreateCallingFile(enumNamespace, EnumName, _enumValues);
+
+            var compliation = CreateCompilation(simpleEnumSource, localisedStrings, testClass);
+            var newComp = RunCompilation(compliation, out var generatorDiags, new ExtensionGenerator());
+            Assert.That(newComp.SyntaxTrees.Count(), Is.EqualTo(5));
+            AssertNoCompilationErrors(generatorDiags);
+
+            // This second compile step allows us to verify whether the output code is working correctly
+            var finalResult = RunFinal(newComp);
+            AssertFinalCompilationSucceeded(finalResult);
+        }
         #region Helper asserts
 
         private static void AssertDiagnosticIds(ImmutableArray<Diagnostic> generatorDiags, params GenerationErrorCode[] expectedErrors)
